@@ -1,0 +1,213 @@
+=================SURF RATING=======================
+
+-----5 Star-----
+windwave: Glass
+wind_direction: Any
+Chop: No Chop or Minimal Chop
+swell_Period: Epic
+swell_disruption: Minimal Disruption or Mild Disruption
+Swell Size: MS, M, L
+swell_x_tide': 'Ideal'
+Swell Direction: Optimal Direction
+
+-----4 Star-----
+Windwave: Glass or Light Wind
+wind_direction: Any
+Chop: No Chop or Minimal Chop
+Swell Period: Good to Epic
+swell disruption: Minimal Disruption, Mild Disruption or Moderate Disruption
+swell_x_tide': 'Ideal': Ideal or working
+Swell Size: MS, M, L
+Swell Direction: Optimal Direction or Working Direction
+
+-----3 Star-----
+Windwave: Not Blown
+Chop: Not Choppy!
+Swell Period: Epic, Good or Medium.
+swell disruption: Minimal Disruption, Mild Disruption or Moderate Disruption
+swell_x_tide': 'Ideal': Ideal or working
+Swell Size: S, MS, M, L
+Swell Direction: Optimal Direction or Working Direction
+
+-----2 Star-----
+Windwave: Any
+Chop: Any
+Swell Period: Any
+swell disruption: Any
+swell_x_tide': 'Ideal': Ideal or working
+Swell Size: Any
+Swell Direction: Any
+
+-----1 Star-----
+Everything else
+
+
+
+=======FINAL PARAMETER SCORES=======
+
+
+Primary Swell Height States:
+
+XS: 0 <= swell_height <= 0.6
+S: 0.6 < swell_height <= 1
+MS: 1 < swell_height <= 2
+M: swell_height == 2
+L: 2 < swell_height <= 3
+XL: 3 < swell_height
+Unknown: Other cases
+
+
+Primary Swell Direction States:
+
+Optimal Direction: 220 <= swell_direction <= 320
+Working Direction: Elsewhere
+
+
+Primary Swell Period States:
+
+Worst: swell_period < 10
+Bad: swell_period < 12
+Medium: 12 <= swell_period <= 14
+Good: 14 <= swell_period <= 16
+Epic: 16 <= swell_period <= 20
+Unknown: Other cases
+
+
+Swell Disruption States:
+
+Total Disruption: normalized_score == 1
+Strong Disruption: normalized_score == 2
+Moderate Disruption: normalized_score == 3
+Mild Disruption: normalized_score == 4
+Minimal Disruption: normalized_score == 5
+
+
+Wind Speed States:
+
+Glass: wind_speed < 7
+Light: 7 <= wind_speed < 10
+Windy: 10 <= wind_speed < 12
+Blown: wind_speed >= 12
+
+
+Wind Direction States:
+
+Terrible: 170 <= wind_direction <= 280
+Cross: 90 <= wind_direction < 170 or 280 <= wind_direction < 350
+Off: 350 <= wind_direction or wind_direction < 90
+
+
+Wind Wave Chop States:
+
+No Chop: wind_wave_height < 0.1
+Minimal Chop: 0.1 <= wind_wave_height < 0.2
+Noticeable: 0.2 <= wind_wave_height < 0.3
+Choppy!: wind_wave_height >= 0.3
+
+========================================
+
+
+
+Parameters to consider, in order of importance, for this particular spot.
+1) Primary Swell Period
+2) Wind
+3) Swell Interruption (number of swell and how they interact)
+4) Swell Direction
+5) Swell Size   
+6) Local 'chop'
+7) Wind Direction
+
+Rating system:
+
+5 Star = Glass, with little local chop and Epic tidy Period, little interruption from other swells. S to SM = Any Tide. SM - Mid = Mid-tide. ML - L = High Tide. North to Western Swell. Size at least Mid.
+4 Star = Glass/Light Wind, Low to Litte chop, Good to Epic Main Swell, little to ML swell interruption. S to SM = Any Tide. SM - Mid = Mid-tide. ML - L = High Tide. Starting at Med-Small Swell. Any direction.
+3 Star = Not Blown. Tolerate until mid chop. Only Mid-Interruption. As long as its not Tiny and high tide, or Mutant/Large and mid to low tide. All good. Any Size, Any direction.
+2 Star = Any Wind. Not terrible Chop. Can be mixed Swells. As long as its not Tiny and high tide, or Mutant/Large and mid to low tide. All good. Any size any direction.
+1 Star = The Rest - Makaha is always Surfable. Any Size any direction
+
+Split Ratings (And their Weights)
+- Size Score 1 - 5 -- Normalised[(Size of primary Swell) + 0.2(Size of Secondary Swell)]
+- Tidiness Score (1 - 5) -- Normalised[Period + Swell Interruption]
+- Glassiness Score (1 - 5) -- Normalised[Wind Speed + Wind Wave Height + 0.3(Wind Direction)]
+- Optimal Direction-ness (1 - 5) -- Normalised[Degrees away from the 270 - 320 degree direction]
+- Closed-out? ( 0 - 1) -- Binary If function Function(Tide*Primary Swell Size)
+
+
+Parameter Score (Each scored --- 1 to 5)
+
+XXXXXX Wind: 
+	<7 = Glass --- 5
+	7-10 = Light Wind --- 4
+	10-12 = Windy --- 3
+	>12 = Blown --- 1
+
+XXXXXX Wind Direction:
+	Terrible: 170 to 280 --- 1
+	Cross: 90 - 170; 280 - 350 --- 4
+	Off: 350 - 90 --- 5
+	
+XXXXXX Local wind chop (Wind wave height, direction doesnt matter)
+<0.1 = Little Chop --- 5
+0.1 - 0.2 = Low --- 4
+0.2 - 0.3 = Mid  ---3
+>0.3 = Terrible ---1
+
+
+XXXXXX Swell Interruption (Delta of Swell 1 and Swell 2)
+
+normalized_score 
+Strong Interf = --- 1
+Moderate Interf --- 2
+Mild Interf --- 4
+Minimal Interf --- 5
+
+*The Following parameters determine the total Swell Interruption. The scored are linearly added up to 15 and then re-normalised to 
+	Directional Difference:
+
+	0-20° difference: Score 4 (Minimal interference)
+	20-40° difference: Score 3 (Mild interference)
+	40-90° difference: Score 2 (Moderate interference
+	)
+	>90 difference: Score 1 (Strong interference)
+	
+	Period Difference:
+	0-2 seconds difference: Score 4 (Minimal interference)
+	2-5 seconds difference: Score 3 (Mild interference)
+	5-10 seconds difference: Score 2 (Moderate interference)
+	10+ seconds difference: Score 1 (Strong interference)
+
+	Size Difference:
+	0-25% of the size of the dominant swell: Score 4 (Minimal interference)
+	25-50% of the size: Score 3 (Mild interference)
+	50-75% of the size: Score 2 (Moderate interference)
+	75-100% or greater: Score 1 (Strong interference)
+
+Tide (Categories and NOT score, only really affects SMALL and LARGE Swells
+High: More than 0.2
+ML: 0 to 0.2
+MS:0 to -0.2
+Low: Less than -0.2
+
+XXXXX Primary Swell Size: 
+0 - 0.6 = XS --- 1
+0 - 1m = S --- 2
+1m - 2m = MS --- 3
+2m = M --- 4
+2 - 3 = L --- 5
+3m + = XL --- 1 (Because in general itll be closing out)
+
+XXXXX Primary Swell Direction (Out of 5)
+Best = 220 - 320 --- 5
+Medium = The Rest --- 2
+
+XXXXX Primary Swell Period:
+	<10 = Worst --- 1
+	<12 = Bad --- 2
+	12 - 14 = Medium --- 3
+	14 - 16 = Good --- 4
+	16 - 20 = Epic --- 5
+
+
+
+
+
